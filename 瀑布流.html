@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 100%;
+            position: relative;
+        }
+
+        .item {
+            position: absolute;
+            background-color: #f00;
+            transition: all 1s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+    </div>
+</body>
+<script>
+    // 元素个数
+    let count = 100;
+
+
+
+    // 瀑布流相关属性
+    // 元素容器
+    let container = document.querySelector('.container');
+    // 元素宽度
+    let width = 150
+    // 水平间距
+    let gutterx = 8
+    // 竖直间距
+    let guttery = 8
+
+    function flow() {
+        // 计算一行能放下多少个元素
+        const lineCount = Math.max(Math.floor(container.clientWidth / width), 1)
+        // 为了让元素居中 横坐标的偏移
+        let offsetx = Math.floor((container.clientWidth - (lineCount * width + (lineCount - 1) * gutterx)) * 0.5);
+        // 纵坐标缓存 保存每一列的 y 坐标
+        let _y = []
+        for (let i = 0; i < lineCount; i++) {
+            _y.push(0)
+        }
+
+        // 循环设置每行
+        const items = document.querySelectorAll('.container>.item')
+        items.forEach((item, idx) => {
+            // 当前元素应当是第几列
+            // _y 中找到最小值的索引
+            const i = _y.indexOf(Math.min(..._y))
+            item.style.left = (offsetx + (i === 0 ? 0 : (i * width + i * gutterx))) + 'px'
+            item.style.top = _y[i] + 'px'
+            _y[i] += item.clientHeight + guttery
+        });
+    }
+
+    window.addEventListener('load', () => {
+        for (let i = 0; i < count; i++) {
+            const div = document.createElement('div');
+            div.className = 'item'
+            div.style.width = width + 'px'
+            div.style.height = (160 + Math.round(Math.random() * 150)) + 'px'
+            div.textContent = i
+            container.appendChild(div)
+        }
+        flow()
+    })
+
+    window.addEventListener('resize', flow)
+</script>
+
+</html>
